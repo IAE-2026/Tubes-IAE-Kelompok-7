@@ -1,0 +1,26 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2026-05-15 13:00:00`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format `Y-m-d`, e.g. `2026-05-15`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+type Query {
+    "Mengambil daftar seluruh jadwal operasional driver."
+    schedules: [Schedule!]! @all
+
+    "Mengambil data spesifik jadwal shift berdasarkan ID."
+    schedule(id: ID! @eq): Schedule @find
+}
+
+type Schedule {
+    id: ID!
+    driver_name: String!
+    vehicle_id: Int!
+    plate_number: String!
+    schedule_date: Date!
+    shift: String!
+    status: String!
+    notes: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}

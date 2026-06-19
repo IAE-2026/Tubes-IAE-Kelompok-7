@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - APP_ENV=local
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=mysql 
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=fuel_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+      - IAE_API_KEY=${IAE_API_KEY}
+      - DIDIT_SERVICE_URL=${DIDIT_SERVICE_URL}
+      - HAFIZH_SERVICE_URL=${HAFIZH_SERVICE_URL}
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: fuel_db
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:

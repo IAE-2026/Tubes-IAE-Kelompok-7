@@ -1,0 +1,16 @@
+type FuelLog {
+    id: ID!
+    vehicle_id: String!
+    driver_name: String!
+    liters: Float!
+    total_cost: Float!
+    fuel_station: String!
+    filled_at: String!
+    created_at: String!
+    updated_at: String!
+}
+
+type Query {
+    fuelLogs: [FuelLog!]! @all
+    fuelLog(id: ID! @eq): FuelLog @find
+}

@@ -1,0 +1,347 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Penjadwalan Driver Service API",
+        "description": "Service B: API untuk mengelola penjadwalan driver operasional. Bagian dari ekosistem Pencatatan Operasional (Pengisian BBM) - Group 7.",
+        "contact": {
+            "name": "Hafizh Rafi Maulana Suyufi",
+            "email": "102022400210@student.telkomuniversity.ac.id"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local Development Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/schedules": {
+            "get": {
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Get all driver schedules",
+                "description": "Mengambil daftar seluruh jadwal operasional driver.",
+                "operationId": "getSchedules",
+                "responses": {
+                    "200": {
+                        "description": "Data retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing auth token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized. Sertakan Bearer JWT (SSO) atau X-IAE-KEY header."
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "X-IAE-KEY": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Create a new schedule",
+                "description": "Menambah jadwal baru. Hanya role admin_operasional dan dispatcher yang diizinkan. Memicu SOAP audit ke IAE Legacy System dan publish event ke iae.central.exchange.",
+                "operationId": "createSchedule",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "driver_name",
+                                    "vehicle_id",
+                                    "plate_number",
+                                    "schedule_date",
+                                    "shift"
+                                ],
+                                "properties": {
+                                    "driver_name": {
+                                        "type": "string",
+                                        "example": "Budi Santoso"
+                                    },
+                                    "vehicle_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "plate_number": {
+                                        "type": "string",
+                                        "example": "B 1234 ABC"
+                                    },
+                                    "schedule_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-05-15"
+                                    },
+                                    "shift": {
+                                        "type": "string",
+                                        "example": "pagi",
+                                        "enum": [
+                                            "pagi",
+                                            "siang",
+                                            "malam"
+                                        ]
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active",
+                                        "enum": [
+                                            "active",
+                                            "completed",
+                                            "cancelled"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Rute Jakarta - Bandung",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Schedule created successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden - Role tidak diizinkan POST"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "X-IAE-KEY": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/schedules/{id}": {
+            "get": {
+                "tags": [
+                    "Schedules"
+                ],
+                "summary": "Get a specific schedule",
+                "description": "Mengambil data spesifik jadwal shift berdasarkan ID.",
+                "operationId": "getScheduleById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Schedule ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Schedule not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Schedule not found"
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized."
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "X-IAE-KEY": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Schedule": {
+                "title": "Schedule",
+                "description": "Driver Schedule model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "driver_name": {
+                        "type": "string",
+                        "example": "Budi Santoso"
+                    },
+                    "vehicle_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "plate_number": {
+                        "type": "string",
+                        "example": "B 1234 ABC"
+                    },
+                    "schedule_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-05-15"
+                    },
+                    "shift": {
+                        "type": "string",
+                        "example": "pagi",
+                        "enum": [
+                            "pagi",
+                            "siang",
+                            "malam"
+                        ]
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active",
+                        "enum": [
+                            "active",
+                            "completed",
+                            "cancelled"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Rute Jakarta - Bandung",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-05-15T10:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-05-15T10:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "description": "JWT dari IAE SSO (https://iae-sso.virtualfri.id). Login sebagai warga21@ktp.iae.id",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
+            "X-IAE-KEY": {
+                "type": "apiKey",
+                "description": "Fallback API Key (Tugas 2): NIM Mahasiswa (102022400210)",
+                "name": "X-IAE-KEY",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Schedules",
+            "description": "Schedules"
+        }
+    ]
+}

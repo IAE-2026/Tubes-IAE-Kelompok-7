@@ -1,0 +1,58 @@
+# =============================================================
+# .dockerignore - Penjadwalan Driver Service
+# =============================================================
+# Files and directories to exclude from Docker build context
+# to reduce image size and prevent sensitive data leaks.
+
+# Dependencies (will be installed during build)
+/vendor/
+/node_modules/
+
+# Environment files (secrets)
+#.env
+.env.backup
+.env.production
+
+# Database
+/database/database.sqlite
+
+# IDE & Editor
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Testing
+.phpunit.result.cache
+phpunit.xml
+/tests/
+
+# Logs & cache
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*
+
+# Vagrant
+Homestead.json
+Homestead.yaml
+
+# Node
+npm-debug.log
+yarn-error.log
+
+# Docker (prevent recursion)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation source
+*.md
+!README.md

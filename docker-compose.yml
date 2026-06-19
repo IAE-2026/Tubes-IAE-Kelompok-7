@@ -1,0 +1,122 @@
+version: '3.8'
+
+services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - tikta-service
+      - didit-service
+      - hafizh-service
+    networks:
+      - iae-network
+
+  tikta-service:
+    build:
+      context: ./monitoring-bbm-service
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:mP427oH871wMvA1/M1h5nI9iG0+z8B7z6z2x1y5u6nE=
+      - DB_CONNECTION=mysql
+      - DB_HOST=tikta-db
+      - DB_PORT=3306
+      - DB_DATABASE=fuel_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+      - DIDIT_SERVICE_URL=http://didit-service:8000
+      - HAFIZH_SERVICE_URL=http://hafizh-service:80
+      - IAE_API_KEY_M2M=KEY-MHS-206
+      - IAE_MHS_NIM=102022400179
+    depends_on:
+      - tikta-db
+    networks:
+      - iae-network
+
+  tikta-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: fuel_db
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - iae-network
+    volumes:
+      - tikta_dbdata:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  didit-service:
+    build:
+      context: ./data-kendaraan-service
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:mP427oH871wMvA1/M1h5nI9iG0+z8B7z6z2x1y5u6nE=
+      - DB_CONNECTION=mysql
+      - DB_HOST=didit-db
+      - DB_PORT=3306
+      - DB_DATABASE=db_kendaraan
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+      - SOAP_AUDIT_TOKEN=KEY-MHS-121
+      - IAE_MHS_NIM=102022400066
+    depends_on:
+      - didit-db
+    networks:
+      - iae-network
+
+  didit-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: db_kendaraan
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - iae-network
+    volumes:
+      - didit_dbdata:/var/lib/mysql
+    ports:
+      - "3309:3306"
+
+  hafizh-service:
+    build:
+      context: ./penjadwalan-driver-service
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:mP427oH871wMvA1/M1h5nI9iG0+z8B7z6z2x1y5u6nE=
+      - DB_CONNECTION=mysql
+      - DB_HOST=hafizh-db
+      - DB_PORT=3306
+      - DB_DATABASE=db_schedule
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+      - SSO_M2M_API_KEY=KEY-MHS-270
+      - IAE_MHS_NIM=102022400210
+    depends_on:
+      - hafizh-db
+    networks:
+      - iae-network
+
+  hafizh-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: db_schedule
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      - iae-network
+    volumes:
+      - hafizh_dbdata:/var/lib/mysql
+    ports:
+      - "3308:3306"
+
+networks:
+  iae-network:
+    driver: bridge
+
+volumes:
+  tikta_dbdata:
+  hafizh_dbdata:
+  didit_dbdata:

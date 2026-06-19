@@ -1,0 +1,426 @@
+{
+	"info": {
+		"_postman_id": "c1f8e12f-48d8-4ed0-9990-2565451a9a1a",
+		"name": "Tubes IAE Integrasi (Dengan Skenario E2E)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Skenario Integrasi (E2E)",
+			"description": "Jalankan folder ini menggunakan 'Run Collection' untuk melihat simulasi integrasi secara otomatis dari pembuatan hingga penghapusan.",
+			"item": [
+				{
+					"name": "1. Login SSO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let res = pm.response.json();",
+									"if(res.access_token) {",
+									"    pm.collectionVariables.set(\"sso_token\", res.access_token);",
+									"    console.log(\"Token berhasil diset!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"warga35@ktp.iae.id\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "https://iae-sso.virtualfri.id/api/login",
+							"protocol": "https",
+							"host": [
+								"iae-sso",
+								"virtualfri",
+								"id"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "2. POST Create Kendaraan (Didit)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let res = pm.response.json();",
+									"if(res.data && res.data.id) {",
+									"    pm.collectionVariables.set(\"vehicle_id\", res.data.id);",
+									"    console.log(\"Vehicle ID disimpan: \" + res.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"license_plate\": \"D 9999 SKENARIO\",\n    \"type\": \"Truk Logistik\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/vehicles",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"vehicles"
+							]
+						}
+					}
+				},
+				{
+					"name": "3. GET Kendaraan Specific",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/vehicles/{{vehicle_id}}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								"{{vehicle_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "4. POST Create Jadwal (Hafizh)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let res = pm.response.json();",
+									"if(res.data && res.data.id) {",
+									"    pm.collectionVariables.set(\"schedule_id\", res.data.id);",
+									"    console.log(\"Schedule ID disimpan: \" + res.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"driver_name\": \"Supir Skenario\",\n    \"vehicle_id\": {{vehicle_id}},\n    \"plate_number\": \"D 9999 SKENARIO\",\n    \"schedule_date\": \"2026-10-10\",\n    \"shift\": \"siang\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/schedules",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"schedules"
+							]
+						}
+					}
+				},
+				{
+					"name": "5. GET Jadwal Specific",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/schedules/{{schedule_id}}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"schedules",
+								"{{schedule_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "6. POST Create Fuel Log Lintas Service (Tikta)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let res = pm.response.json();",
+									"if(res.data && res.data.id) {",
+									"    pm.collectionVariables.set(\"fuel_log_id\", res.data.id);",
+									"    console.log(\"Fuel Log ID disimpan: \" + res.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vehicle_id\": {{vehicle_id}},\n    \"schedule_id\": {{schedule_id}},\n    \"driver_name\": \"Supir Skenario\",\n    \"liters\": 25,\n    \"total_cost\": 250000,\n    \"fuel_station\": \"SPBU Skenario Terpadu\",\n    \"filled_at\": \"2026-10-10 14:00:00\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/fuel-logs",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"fuel-logs"
+							]
+						}
+					}
+				},
+				{
+					"name": "7. GET Fuel Log Specific",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/fuel-logs/{{fuel_log_id}}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"fuel-logs",
+								"{{fuel_log_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "8. DELETE Fuel Log",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/fuel-logs/{{fuel_log_id}}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"fuel-logs",
+								"{{fuel_log_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "9. DELETE Jadwal",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/schedules/{{schedule_id}}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"schedules",
+								"{{schedule_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "10. DELETE Kendaraan",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{sso_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/v1/vehicles/{{vehicle_id}}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"vehicles",
+								"{{vehicle_id}}"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

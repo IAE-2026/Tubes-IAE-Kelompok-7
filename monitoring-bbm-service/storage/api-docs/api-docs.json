@@ -1,0 +1,139 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Fuel Monitoring Service API",
+        "description": "API untuk Fuel Monitoring Service",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/fuel-logs": {
+            "get": {
+                "tags": [
+                    "Fuel Logs"
+                ],
+                "summary": "Ambil semua fuel log",
+                "operationId": "9b002b4b7fdb6648bd617b71e3a883df",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Fuel Logs"
+                ],
+                "summary": "Tambah fuel log baru",
+                "operationId": "7dc94d591ed865f5ed60bf8fd5f19a1a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "vehicle_id",
+                                    "driver_name",
+                                    "liters",
+                                    "total_cost",
+                                    "fuel_station",
+                                    "filled_at"
+                                ],
+                                "properties": {
+                                    "vehicle_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "driver_name": {
+                                        "type": "string",
+                                        "example": "Budi Santoso"
+                                    },
+                                    "liters": {
+                                        "type": "number",
+                                        "example": 40.5
+                                    },
+                                    "total_cost": {
+                                        "type": "number",
+                                        "example": 350000
+                                    },
+                                    "fuel_station": {
+                                        "type": "string",
+                                        "example": "SPBU Pertamina Bandung"
+                                    },
+                                    "filled_at": {
+                                        "type": "string",
+                                        "example": "2026-05-16 10:00:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/fuel-logs/{id}": {
+            "get": {
+                "tags": [
+                    "Fuel Logs"
+                ],
+                "summary": "Ambil fuel log berdasarkan ID",
+                "operationId": "ee6634bb6a46ef5fb4904a663b8a690a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "apiKey": {
+                "type": "apiKey",
+                "name": "X-IAE-KEY",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Fuel Logs"
+        }
+    ]
+}
